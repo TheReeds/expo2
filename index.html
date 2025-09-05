@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Quinta Disciplina</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .slide-counter {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .slide {
+            flex: 1;
+            padding: 60px 80px;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .chapter-indicator {
+            font-size: 0.9rem;
+            color: #00d4ff;
+            font-weight: 500;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .slide h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .slide h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            letter-spacing: -0.02em;
+            color: #00d4ff;
+        }
+
+        .slide h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+
+        .slide p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .slide ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .slide li {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .reference-link {
+            color: #00d4ff;
+            text-decoration: none;
+            cursor: pointer;
+            border-bottom: 1px solid transparent;
+            transition: border-bottom 0.3s ease;
+        }
+
+        .reference-link:hover {
+            border-bottom: 1px solid #00d4ff;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #00d4ff;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #00d4ff;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px #00d4ff;
+        }
+
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .chapter-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chapter-card:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: #00d4ff;
+        }
+
+        .highlight {
+            background: linear-gradient(90deg, #00d4ff20, transparent);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.7;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .intro-text {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            max-width: 800px;
+        }
+
+        .quote-box {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 4px solid #00d4ff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .law-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .archetype-box {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .connection-box {
+            background: rgba(255, 107, 107, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .author-info {
+            text-align: right;
+            font-style: italic;
+            opacity: 0.6;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">LA QUINTA DISCIPLINA</div>
+            <div class="slide-counter">
+                <span id="current-slide">1</span> / <span id="total-slides">15</span>
+            </div>
+        </header>
+
+        <!-- Slide 1: Título -->
+        <div class="slide active">
+            <h1>LA QUINTA DISCIPLINA</h1>
+            <p class="subtitle">El arte y la práctica de la organización abierta al aprendizaje</p>
+            <p class="intro-text">
+                Las herramientas e ideas presentadas en este libro están destinadas a destruir la ilusión de que 
+                el mundo está compuesto por fuerzas separadas y desconectadas. Cuando abandonemos esta 
+                ilusión podemos construir <span class="highlight">"organizaciones inteligentes"</span>, donde la gente expande 
+                continuamente su aptitud para crear los resultados que desea.
+            </p>
+            
+            <div class="quote-box">
+                <p><strong>"La capacidad de aprender con mayor rapidez que los competidores quizá sea la única ventaja competitiva sostenible"</strong></p>
+                <p style="text-align: right; margin-top: 10px; opacity: 0.8;">- Arie de Geus</p>
+            </div>
+
+            <p class="author-info">Peter M. Senge - Editorial GRANICA, Barcelona 1992</p>
+        </div>
+
+        <!-- Slide 2: Las 5 Disciplinas Overview -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 1 - "DADME UNA PALANCA Y MOVERÉ EL MUNDO"</div>
+            <h2>Las Cinco Disciplinas Convergentes</h2>
+            <p>En la actualidad, cinco nuevas "tecnologías de componentes" convergen para innovar las organizaciones inteligentes. 
+            Aunque se desarrollaron por separado, cada cual resultará decisiva para el éxito de las demás.</p>
+            
+            <div class="chapter-grid">
+                <div class="chapter-card" onclick="goToSlide(11)">
+                    <h3>1. Pensamiento Sistémico</h3>
+                    <p>Un marco conceptual para ver patrones totales, comprender interrelaciones y modificar estructuras subyacentes.</p>
+                </div>
+                <div class="chapter-card" onclick="goToSlide(12)">
+                    <h3>2. Dominio Personal</h3>
+                    <p>La disciplina para aclarar y ahondar continuamente nuestra visión personal, concentrar energías y ver la realidad objetivamente.</p>
+                </div>
+                <div class="chapter-card" onclick="goToSlide(13)">
+                    <h3>3. Modelos Mentales</h3>
+                    <p>Supuestos hondamente arraigados, generalizaciones e imágenes que influyen sobre nuestro modo de comprender el mundo.</p>
+                </div>
+                <div class="chapter-card" onclick="goToSlide(14)">
+                    <h3>4. Construcción de Visión Compartida</h3>
+                    <p>La capacidad para compartir una imagen de futuro que se procura crear, uniendo a la gente en torno a una identidad común.</p>
+                </div>
+                <div class="chapter-card" onclick="goToSlide(15)">
+                    <h3>5. Aprendizaje en Equipo</h3>
+                    <p>La disciplina del "diálogo" - la capacidad de suspender supuestos e ingresar en un auténtico pensamiento conjunto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Metanoia -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 1 - METANOIA: UN CAMBIO DE ENFOQUE</div>
+            <h2>Metanoia: Un Cambio de Enfoque</h2>
+            
+            <p>La palabra más precisa para describir lo que sucede en una organización inteligente es un vocablo que no ha gozado de gran difusión en los últimos cien años: <span class="highlight">"metanoia"</span>.</p>
+            
+            <h3>Significado de Metanoia:</h3>
+            <ul>
+                <li><strong>Etimología griega:</strong> "meta" (por encima o más allá) + "noia" (de la mente)</li>
+                <li><strong>Significado original:</strong> Desplazamiento mental o cambio de enfoque fundamental</li>
+                <li><strong>Tradición cristiana gnóstica:</strong> Despertar la intuición compartida y conocimiento directo de lo más elevado</li>
+                <li><strong>En el corpus católico:</strong> Eventualmente traducido como "arrepentimiento"</li>
+            </ul>
+            
+            <div class="quote-box">
+                <p>Captar el significado de "metanoia" es captar el significado más profundo de "aprendizaje", 
+                pues el aprendizaje también supone un decisivo desplazamiento o tránsito mental.</p>
+            </div>
+            
+            <h3>Aprendizaje Adaptativo vs. Generativo</h3>
+            <p>Una organización inteligente conjuga el <span class="highlight">"aprendizaje adaptativo"</span> 
+            (supervivencia) con el <span class="highlight">"aprendizaje generativo"</span> (creativo), 
+            que aumenta nuestra capacidad creativa.</p>
+        </div>
+
+        <!-- Slide 4: Problemas de Aprendizaje -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 2 - ¿SU ORGANIZACIÓN TIENE PROBLEMAS DE APRENDIZAJE?</div>
+            <h2>Las Siete Barreras del Aprendizaje</h2>
+            <p>El modo en que las organizaciones están diseñadas y administradas crea problemas fundamentales de aprendizaje:</p>
+            
+            <div class="law-grid">
+                <div>
+                    <h3>1. "Yo soy mi puesto"</h3>
+                    <p>Las personas se ven dentro de un sistema sobre el cual no ejercen influencia, limitando su responsabilidad al puesto.</p>
+                    
+                    <h3>2. "El enemigo externo"</h3>
+                    <p>Propensión a culpar factores externos. El "afuera" y "adentro" suelen formar parte del mismo sistema.</p>
+                    
+                    <h3>3. La ilusión de hacerse cargo</h3>
+                    <p>La "proactividad" es a menudo reactividad disfrazada. La verdadera proactividad surge de ver cómo intensificamos nuestros problemas.</p>
+                    
+                    <h3>4. La fijación en los hechos</h3>
+                    <p>Las amenazas principales no vienen de hechos repentinos sino de procesos lentos y graduales.</p>
+                </div>
+                
+                <div>
+                    <h3>5. La parábola de la rana hervida</h3>
+                    <p>Si ponemos una rana en agua hirviente, salta. En agua temperada que se calienta gradualmente, no detecta el peligro y muere.</p>
+                    
+                    <h3>6. La ilusión de "se aprende con la experiencia"</h3>
+                    <p>Las decisiones más críticas tienen consecuencias que se extienden durante años o décadas, fuera de nuestro horizonte de aprendizaje.</p>
+                    
+                    <h3>7. El mito del equipo administrativo</h3>
+                    <p>Los equipos luchan por territorio, evitan quedar mal y fingen respaldar estrategias, desarrollando "incompetencia calificada".</p>
+                </div>
+            </div>
+            
+            <div class="connection-box">
+                <p><strong>Conexión sistémica:</strong> Estas barreras solo se superan desarrollando las cinco disciplinas de forma integrada, 
+                especialmente mediante <span class="reference-link" onclick="goToSlide(13)">modelos mentales</span> que reconozcan los patrones sistémicos.</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Estructura Sistémica -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 3 - ¿PRISIONEROS DEL SISTEMA O DE NUESTRO PENSAMIENTO?</div>
+            <h2>La Estructura Influye sobre la Conducta</h2>
+            
+            <p>Cuando pertenecen al mismo sistema, las personas, a pesar de sus diferencias, suelen producir resultados similares.</p>
+            
+            <h3>Estructura Sistémica:</h3>
+            <p>Se refiere a las <span class="highlight">interrelaciones clave</span> que influyen sobre la conducta a lo largo del tiempo. 
+            No son interrelaciones entre personas, sino entre variables clave como:</p>
+            <ul>
+                <li>Población, recursos naturales y producción alimentaria (país en desarrollo)</li>
+                <li>Ideas de productos, know-how técnico y administrativo (compañía tecnológica)</li>
+                <li>Políticas operativas de quienes toman decisiones en el sistema</li>
+            </ul>
+            
+            <div class="quote-box">
+                <p><strong>Principio fundamental:</strong> La estructura genera conducta, y el cambio de estructuras subyacentes 
+                puede generar otros patrones de conducta. Las explicaciones estructurales son inherentemente generativas.</p>
+            </div>
+            
+            <h3>Implicación para el Liderazgo:</h3>
+            <p>Como la estructura incluye las "políticas operativas" de los decisores, 
+            la redefinición de nuestras tomas de decisión redefine la estructura del sistema.</p>
+            
+            <div class="connection-box">
+                <p><strong>Conexión con otras disciplinas:</strong> Comprender la estructura requiere 
+                <span class="reference-link" onclick="goToSlide(11)">pensamiento sistémico</span> y 
+                <span class="reference-link" onclick="goToSlide(13)">modelos mentales</span> que vayan más allá de las personalidades y eventos.</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Las 11 Leyes -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 4 - LAS LEYES DE LA QUINTA DISCIPLINA</div>
+            <h2>Las 11 Leyes de la Quinta Disciplina</h2>
+            
+            <div class="law-grid">
+                <div>
+                    <h3>Leyes 1-6:</h3>
+                    <ul>
+                        <li><strong>1.</strong> Los problemas de hoy derivan de las "soluciones" de ayer</li>
+                        <li><strong>2.</strong> Cuanto más se presiona, más presiona el sistema</li>
+                        <li><strong>3.</strong> La conducta mejora antes de empeorar</li>
+                        <li><strong>4.</strong> El camino fácil lleva al mismo lugar</li>
+                        <li><strong>5.</strong> La cura puede ser peor que la enfermedad</li>
+                        <li><strong>6.</strong> Lo más rápido es lo más lento</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>Leyes 7-11:</h3>
+                    <ul>
+                        <li><strong>7.</strong> La causa y el efecto no están próximos en tiempo y espacio</li>
+                        <li><strong>8.</strong> Los cambios pequeños pueden producir resultados grandes</li>
+                        <li><strong>9.</strong> Se pueden alcanzar dos metas aparentemente contradictorias</li>
+                        <li><strong>10.</strong> Dividir un elefante por la mitad no genera dos elefantes pequeños</li>
+                        <li><strong>11.</strong> No hay culpa</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="archetype-box">
+                <h3>Ley 8: El Principio de la Palanca</h3>
+                <p>Los actos pequeños y bien focalizados a veces producen mejoras significativas y duraderas, 
+                si se realizan en el sitio apropiado. Las zonas de alto apalancamiento no son evidentes 
+                para la mayoría de los integrantes del sistema.</p>
+            </div>
+            
+            <div class="connection-box">
+                <p><strong>Aplicación práctica:</strong> Estas leyes se manifiestan en los 
+                <span class="reference-link" onclick="goToSlide(7)">arquetipos sistémicos</span> y requieren 
+                <span class="reference-link" onclick="goToSlide(12)">dominio personal</span> para su aplicación efectiva.</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Arquetipos Sistémicos -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 6 - CONFIGURACIONES NATURALES: PATRONES QUE CONTROLAN</div>
+            <h2>Arquetipos Sistémicos</h2>
+            <p>Ciertos patrones estructurales son recurrentes. Estos "arquetipos sistémicos" constituyen la clave para aprender a ver estructuras.</p>
+            
+            <div class="archetype-box">
+                <h3>Arquetipo 1: Límites del Crecimiento</h3>
+                <p><strong>Definición:</strong> Un proceso reforzador se pone en marcha para producir un resultado deseado, 
+                pero genera efectos secundarios que eventualmente atentan contra el éxito.</p>
+                <p><strong>Principio administrativo:</strong> No precipites el crecimiento; elimina los factores que limitan el crecimiento.</p>
+                <p><strong>Patrón:</strong> Después del auge inicial, el crecimiento se detiene misteriosamente. 
+                La gente reacciona presionando más, pero esto fortalece el proceso compensador.</p>
+            </div>
+            
+            <div class="archetype-box">
+                <h3>Arquetipo 2: Desplazamiento de la Carga</h3>
+                <p><strong>Definición:</strong> Un problema subyacente genera síntomas. Como es difícil abordarlo, 
+                la gente desplaza la carga a soluciones fáciles que aplacan síntomas.</p>
+                <p><strong>Principio administrativo:</strong> No solucione los síntomas. Las soluciones sintomáticas 
+                a lo sumo brindan beneficios a corto plazo.</p>
+                <p><strong>Ejemplo:</strong> Estrés laboral → alcohol/drogas vs. limitar carga de trabajo</p>
+            </div>
+            
+            <div class="connection-box">
+                <p><strong>Dominio de arquetipos:</strong> Requiere <span class="reference-link" onclick="goToSlide(11)">pensamiento sistémico</span> 
+                para ver patrones, <span class="reference-link" onclick="goToSlide(13)">modelos mentales</span> para reconocer supuestos, 
+                y <span class="reference-link" onclick="goToSlide(15)">aprendizaje en equipo</span> para implementar soluciones.</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Realimentación -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 5 - UN CAMBIO DE ENFOQUE</div>
+            <h2>Realimentación y Demoras</h2>
+            <h3>Los ladrillos del pensamiento sistémico</h3>
+            
+            <p>La práctica del pensamiento sistémico comienza con la comprensión del concepto de <span class="highlight">feedback</span> 
+            o "realimentación".</p>
+            
+            <div class="law-grid">
+                <div>
+                    <h3 style="color: #00d4ff;">Realimentación Reforzadora</h3>
+                    <p>Son los motores del crecimiento. Cuando las cosas crecen, está operando realimentación reforzadora.</p>
+                    <p><strong>Ejemplos:</strong></p>
+                    <ul>
+                        <li>Profecía autocumplida (efecto Pigmalión)</li>
+                        <li>Círculos viciosos y virtuosos</li>
+                        <li>Crisis de pánico financiero</li>
+                        <li>Espiral de ejercicio físico</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: #ff6b6b;">Realimentación Compensadora</h3>
+                    <p>Opera cuando hay una conducta orientada hacia metas. Actúa como sistema autocorrectivo.</p>
+                    <p><strong>Características:</strong></p>
+                    <ul>
+                        <li>Buscan estabilidad</li>
+                        <li>A menudo tienen metas implícitas</li>
+                        <li>Generan resistencia al cambio</li>
+                        <li>Son difíciles de ver porque "no pasa nada"</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3>Demoras: La clave es "finalmente"</h3>
+            <p>Las pausas entre nuestros actos y sus consecuencias. Las demoras no reconocidas pueden derivar en "excesos" 
+            y en decisiones que van más lejos de lo necesario.</p>
+            
+            <div class="connection-box">
+                <p><strong>Integración:</strong> Entender realimentación y demoras es esencial para el 
+                <span class="reference-link" onclick="goToSlide(12)">dominio personal</span> (tensión creativa) y 
+                <span class="reference-link" onclick="goToSlide(13)">modelos mentales</span> (comprender patrones de conducta).</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Complejidad Dinámica -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 5 - VER EL MUNDO DE NUEVO</div>
+            <h2>Complejidad Dinámica vs. Complejidad de Detalles</h2>
+            
+            <p>Herramientas sofisticadas de pronóstico y análisis a menudo fracasan porque están diseñadas para manipular 
+            la <span class="highlight">complejidad de detalles</span> (muchas variables) pero no la <span class="highlight">complejidad dinámica</span>.</p>
+            
+            <h3>Complejidad Dinámica existe cuando:</h3>
+            <ul>
+                <li>La misma acción tiene efectos drásticamente distintos a corto y largo plazo</li>
+                <li>Una acción tiene consecuencias locales y otras distintas en otra parte del sistema</li>
+                <li>Las intervenciones obvias producen consecuencias no obvias</li>
+                <li>La causa y el efecto son sutiles</li>
+            </ul>
+            
+            <div class="quote-box">
+                <p>Para hallar un punto de apalancamiento en la mayoría de las situaciones empresariales 
+                hay que comprender la complejidad dinámica, no la complejidad de los detalles.</p>
+            </div>
+            
+            <h3>Cambio de Enfoque del Pensamiento Sistémico:</h3>
+            <ul>
+                <li>Ver <strong>interrelaciones</strong> en vez de concatenaciones lineales de causa-efecto</li>
+                <li>Ver <strong>procesos de cambio</strong> en vez de "instantáneas" estáticas</li>
+            </ul>
+            
+            <div class="connection-box">
+                <p><strong>Perspectiva de realimentación:</strong> Abandona el supuesto de que debe haber un agente individual responsable. 
+                Todos comparten responsabilidad por los problemas generados por el sistema, aunque con diferente apalancamiento para modificarlo.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10: Arte de Ver -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 8 - EL ARTE DE VER LOS ÁRBOLES SIN DEJAR DE VER EL BOSQUE</div>
+            <h2>Ver Árboles y Bosque Simultáneamente</h2>
+            
+            <p>El desafío es retroceder para ver el bosque, pero la mayoría solo ve "muchos árboles" y escoge unos favoritos para modificar.</p>
+            
+            <h3>Beneficios del Pensamiento Sistémico:</h3>
+            <ul>
+                <li>Distinguir entre cambios de alto y bajo apalancamiento</li>
+                <li>Ver estructuras subyacentes que generan el cambio</li>
+                <li>Organizar la complejidad en exposiciones coherentes</li>
+                <li>Identificar causas de problemas y remedios duraderos</li>
+            </ul>
+            
+            <div class="quote-box">
+                <p>El problema fundamental no es la información escasa sino la información excesiva. 
+                Necesitamos distinguir lo importante de lo irrelevante, las variables decisivas de las secundarias.</p>
+            </div>
+            
+            <h3>Ejemplo: Jimmy Carter</h3>
+            <p>Se consagraba profundamente a los problemas del país pero se ganó fama de líder ineficaz. 
+            Su afán de conocer los problemas lo sofocaba con detalles, sin darle perspectiva clara.</p>
+            
+            <div class="connection-box">
+                <p><strong>Integración necesaria:</strong> El dominio del pensamiento sistémico requiere las otras disciplinas. 
+                Cada una aporta principios y herramientas para <span class="reference-link" onclick="goToSlide(12)">cambiar nuestro enfoque del mundo</span>, 
+                abandonar la perspectiva lineal y dominar el arte de ver y actuar sistemáticamente.</p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Pensamiento Sistémico -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 5 - LA QUINTA DISCIPLINA</div>
+            <h2>Pensamiento Sistémico: La Quinta Disciplina</h2>
+            
+            <p>Es vital que las cinco disciplinas se desarrollen como un conjunto. El pensamiento sistémico es la quinta disciplina 
+            porque integra las demás fusionándolas en un cuerpo coherente de teoría y práctica.</p>
+            
+            <h3>¿Por qué es la "Quinta" Disciplina?</h3>
+            <ul>
+                <li>Es la piedra angular conceptual que integra todas las demás</li>
+                <li>Permite comprender el aspecto más sutil de la organización inteligente</li>
+                <li>Sin él, no hay incentivos para integrar las otras disciplinas</li>
+                <li>Cambia nuestra percepción: de separados del mundo a conectados con él</li>
+            </ul>
+            
+            <div class="quote-box">
+                <p><strong>"Sin pensamiento sistémico, la semilla de la visión cae en un terreno árido"</strong></p>
+            </div>
+            
+            <h3>Cómo Integra las Otras Disciplinas:</h3>
+            <ul>
+                <li><strong>Visión Compartida:</strong> Alienta compromiso a largo plazo</li>
+                <li><strong>Modelos Mentales:</strong> Enfatiza apertura para desnudar limitaciones</li>
+                <li><strong>Aprendizaje en Equipo:</strong> Desarrolla aptitudes para perspectivas más amplias</li>
+                <li><strong>Dominio Personal:</strong> Alienta motivación para aprender continuamente</li>
+            </ul>
+            
+            <div class="connection-box">
+                <p><strong>Transformación fundamental:</strong> En una organización inteligente hay un cambio de perspectiva: 
+                en vez de considerarnos separados del mundo, nos consideramos conectados con el mundo; 
+                en vez de que un factor "externo" cause nuestros problemas, vemos que nuestros actos crean los problemas que experimentamos.</p>
+            </div>
+        </div>
+
+        <!-- Slide 12: Dominio Personal -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 9 - DOMINIO PERSONAL</div>
+            <h2>Dominio Personal: El Espíritu de la Organización Inteligente</h2>
+            
+            <p>Las organizaciones sólo aprenden a través de individuos que aprenden. El aprendizaje individual no garantiza 
+            el aprendizaje organizacional, pero no hay aprendizaje organizacional sin aprendizaje individual.</p>
+            
+            <h3>Definición:</h3>
+            <p>La disciplina del crecimiento y el aprendizaje personal. Trasciende la competencia y las habilidades, 
+            aunque se basa en ellas. Significa abordar la vida como una tarea creativa.</p>
+            
+            <h3>Dos Movimientos Subyacentes:</h3>
+            <ul>
+                <li><strong>Clarificar continuamente</strong> lo que es importante para nosotros (visión personal)</li>
+                <li><strong>Aprender continuamente</strong> a ver con mayor claridad la realidad actual</li>
+            </ul>
+            
+            <div class="archetype-box">
+                <h3>Tensión Creativa</h3>
+                <p>La yuxtaposición entre visión (lo que deseamos) y realidad actual (dónde estamos) genera tensión creativa: 
+                una fuerza para unir ambos puntos. La esencia del dominio personal consiste en aprender a generar y sostener esta tensión.</p>
+            </div>
+            
+            <h3>Características de Alto Dominio Personal:</h3>
+            <ul>
+                <li>Sentido especial del propósito que subyace en sus visiones</li>
+                <li>Ven la realidad actual como aliado, no enemigo</li>
+                <li>Trabajan con las fuerzas del cambio en vez de resistirlas</li>
+                <li>Son profundamente inquisitivas</li>
+                <li>Se sienten conectadas con otras personas y con la vida</li>
+                <li>Viven en continua modalidad de aprendizaje</li>
+            </ul>
+            
+            <div class="connection-box">
+                <p><strong>Conexión sistémica:</strong> El dominio personal desarrolla <span class="reference-link" onclick="goToSlide(13)">modelos mentales</span> 
+                más claros, alimenta la <span class="reference-link" onclick="goToSlide(14)">visión compartida</span> y proporciona la energía 
+                personal necesaria para el <span class="reference-link" onclick="goToSlide(15)">aprendizaje en equipo</span>.</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Modelos Mentales -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 10 - MODELOS MENTALES</div>
+            <h2>Modelos Mentales: Por qué Fracasan las Mejores Ideas</h2>
+            
+            <p>Los nuevos conceptos no se llevan a la práctica porque chocan con profundas imágenes internas acerca del funcionamiento del mundo, 
+            imágenes que nos limitan a modelos familiares de pensar y actuar.</p>
+            
+            <h3>¿Qué son los Modelos Mentales?</h3>
+            <p>Supuestos hondamente arraigados, generalizaciones e imágenes que influyen sobre nuestro modo de comprender el mundo y actuar. 
+            Son activos porque moldean nuestros actos y afectan lo que vemos.</p>
+            
+            <h3>Aptitudes Básicas para Trabajar con Modelos Mentales:</h3>
+            <ul>
+                <li><strong>Reconocimiento de "brincos de abstracción":</strong> Saltos de observación a generalización</li>
+                <li><strong>Exponer la "columna izquierda":</strong> Manifestar lo que normalmente callamos</li>
+                <li><strong>Equilibrar indagación con persuasión:</strong> Aptitudes para investigación honesta</li>
+                <li><strong>Distinguir teorías expuestas vs. teorías-en-uso:</strong> Lo que decimos vs. lo que hacemos</li>
+            </ul>
+            
+            <div class="archetype-box">
+                <h3>Caso Shell: Descubrimiento del Poder</h3>
+                <p>Royal Dutch/Shell descubrió que al ayudar a los managers a clarificar supuestos y elaborar nuevas estrategias 
+                basadas en conceptos nuevos, obtenía una singular ventaja competitiva durante las turbulencias petroleras de los años 70.</p>
+            </div>
+            
+            <h3>Indagación Recíproca:</h3>
+            <p>El aprendizaje más productivo se produce cuando los gerentes combinan indagación con persuasión: 
+            cada cual explicita su pensamiento y lo somete al examen público, creando genuina vulnerabilidad.</p>
+            
+            <div class="connection-box">
+                <p><strong>Sinergia con pensamiento sistémico:</strong> Los <span class="reference-link" onclick="goToSlide(11)">modelos mentales</span> 
+                sin pensamiento sistémico pierden potencia. Juntos, pasan de modelos dominados por hechos a modelos que reconocen 
+                patrones de cambio de largo plazo y estructuras subyacentes.</p>
+            </div>
+        </div>
+
+        <!-- Slide 14: Visión Compartida -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 4 - CONSTRUCCIÓN DE UNA VISIÓN COMPARTIDA</div>
+            <h2>Construcción de una Visión Compartida</h2>
+            
+            <p>Si una idea sobre el liderazgo ha inspirado a las organizaciones durante miles de años, 
+            es la capacidad para compartir una imagen de futuro que se procura crear.</p>
+            
+            <h3>Poder de la Visión Genuina:</h3>
+            <p>Cuando hay una visión genuina la gente no sobresale ni aprende porque se lo ordenen sino porque lo desea. 
+            Cuesta concebir una organización que haya alcanzado cierta grandeza sin metas, valores y misiones profundamente compartidos.</p>
+            
+            <h3>Problemas Comunes:</h3>
+            <ul>
+                <li>Muchos líderes tienen visiones personales que nunca se traducen en visiones compartidas</li>
+                <li>La visión gira en torno del carisma del líder o de una crisis temporal</li>
+                <li>Falta una disciplina para traducir visión individual en visión compartida</li>
+            </ul>
+            
+            <div class="quote-box">
+                <p>Dada la opción, la mayoría de la gente prefiere perseguir una meta elevada, 
+                no sólo en tiempos de crisis sino en todo momento.</p>
+            </div>
+            
+            <h3>Lo que Faltaba:</h3>
+            <p>Una disciplina para traducir la visión individual en una visión compartida: no un "recetario", 
+            sino un conjunto de principios y prácticas rectoras.</p>
+            
+            <h3>Niveles de Compromiso:</h3>
+            <ul>
+                <li><strong>Apatía:</strong> Falta de interés o energía</li>
+                <li><strong>Cumplimiento:</strong> Se hace lo necesario</li>
+                <li><strong>Alistamiento:</strong> Se hace lo necesario y más</li>
+                <li><strong>Compromiso:</strong> Se quiere la visión</li>
+                <li><strong>Co-creación:</strong> Se responsabiliza por la visión</li>
+            </ul>
+            
+            <div class="connection-box">
+                <p><strong>Fundamento en dominio personal:</strong> La visión compartida surge de 
+                <span class="reference-link" onclick="goToSlide(12)">visiones personales</span> genuinas. 
+                Sin <span class="reference-link" onclick="goToSlide(11)">pensamiento sistémico</span>, 
+                permanece como simple aspiración sin comprensión de las fuerzas que deben cultivarse.</p>
+            </div>
+        </div>
+
+        <!-- Slide 15: Aprendizaje en Equipo -->
+        <div class="slide">
+            <div class="chapter-indicator">CAPÍTULO 4 - APRENDIZAJE EN EQUIPO</div>
+            <h2>Aprendizaje en Equipo</h2>
+            
+            <p>Cuando los equipos aprenden de veras, no sólo generan resultados extraordinarios sino que sus integrantes crecen con mayor rapidez.</p>
+            
+            <h3>Fundamento: El Diálogo</h3>
+            <p>La disciplina del aprendizaje en equipo comienza con el "diálogo", la capacidad de los miembros para 
+            "suspender los supuestos" e ingresar en un auténtico "pensamiento conjunto".</p>
+            
+            <div class="archetype-box">
+                <h3>Diálogo vs. Discusión</h3>
+                <p><strong>Diálogo:</strong> Para los griegos, dia-logos significaba el libre flujo del significado a través del grupo, 
+                lo cual permitía al conjunto descubrir percepciones que no se alcanzaban individualmente.</p>
+                
+                <p><strong>Discusión:</strong> Tiene las mismas raíces que "percusión" y "concusión", y literalmente consiste 
+                en un "peloteo" de ideas en una competencia donde el ganador se queda con todo.</p>
+            </div>
+            
+            <h3>Patrones Defensivos:</h3>
+            <p>La disciplina del diálogo implica aprender a reconocer los patrones de interacción que erosionan el aprendizaje. 
+            Los patrones de defensa están profundamente enraizados en el funcionamiento del equipo.</p>
+            
+            <h3>Diferencia con Disciplinas Tradicionales:</h3>
+            <p>Las cinco disciplinas de aprendizaje difieren de las disciplinas tradicionales de administración por ser "personales". 
+            Cada cual se relaciona con nuestro modo de pensar, con lo que queremos y con nuestra manera de interactuar.</p>
+            
+            <div class="quote-box">
+                <p>Practicar una disciplina es diferente de emular un "modelo". Las innovaciones descritas como "mejores prácticas" 
+                causan más daños que beneficios y generan una copia fragmentaria.</p>
+            </div>
+            
+            <div class="connection-box">
+                <p><strong>Integración total:</strong> El aprendizaje en equipo desarrolla las aptitudes de grupos para buscar una figura 
+                más amplia que trascienda las perspectivas individuales. Requiere <span class="reference-link" onclick="goToSlide(12)">dominio personal</span> 
+                de los miembros, <span class="reference-link" onclick="goToSlide(13)">modelos mentales</span> compartidos, 
+                <span class="reference-link" onclick="goToSlide(14)">visión compartida</span> y <span class="reference-link" onclick="goToSlide(11)">pensamiento sistémico</span> 
+                para ver patrones grupales.</p>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="previousSlide()">‹</button>
+            <button class="nav-btn" id="nextBtn" onclick="nextSlide()">›</button>
+        </div>
+
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            document.getElementById('progressBar').style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function goToSlide(slideNumber) {
+            showSlide(slideNumber - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
